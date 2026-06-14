@@ -19,16 +19,6 @@ const storeApiConfigs = {
   }
 };
 
-function jsonResponse(response, statusCode, payload) {
-  response.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization"
-  });
-  response.end(JSON.stringify(payload));
-}
-
 function dashboardHeaders(origin, token) {
   const headers = {
     Accept: "*/*",
@@ -70,7 +60,8 @@ async function fetchSystemSale(storeId, isoDate) {
   });
 
   if (!jwtResponse.ok) {
-    throw new Error(`JWT request failed with status ${jwtResponse.status}.`);
+    const errorText = await jwtResponse.text().catch(() => "");
+    throw new Error(`JWT request failed with status ${jwtResponse.status}. ${errorText.slice(0, 120)}`);
   }
 
   const jwtData = await jwtResponse.json();
@@ -82,7 +73,8 @@ async function fetchSystemSale(storeId, isoDate) {
   });
 
   if (!dashboardResponse.ok) {
-    throw new Error(`Dashboard request failed with status ${dashboardResponse.status}.`);
+    const errorText = await dashboardResponse.text().catch(() => "");
+    throw new Error(`Dashboard request failed with status ${dashboardResponse.status}. ${errorText.slice(0, 120)}`);
   }
 
   const dashboardData = await dashboardResponse.json();
@@ -97,7 +89,29 @@ async function fetchSystemSale(storeId, isoDate) {
   };
 }
 
-module.exports = {
-  fetchSystemSale,
-  jsonResponse
+exports.handler = async (event) => {
+  try {
+    const payload = await fetchSystemSale(event.queryStringParameters?.store, event.queryStringParameters?.date);
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      },
+      body: JSON.stringify(payload)
+    };
+  } catch (error) {
+    return {
+      statusCode: 502,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      },
+      body: JSON.stringify({ error: error.message || "Could not fetch system sale." })
+    };
+  }
 };
