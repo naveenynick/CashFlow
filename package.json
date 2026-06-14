@@ -1,0 +1,10 @@
+{
+  "name": "daily-cash-flow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Daily retail cash-flow reconciliation app.",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check public/app.js && node --check server.js && node --check netlify/functions/system-sale.js"
+  }
+}

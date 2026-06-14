@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily Cash Flow</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <section class="auth-shell" id="authShell">
+      <form class="auth-panel" id="loginForm">
+        <p class="eyebrow">PATANJALI STORE</p>
+        <h1>Daily Cash Flow</h1>
+        <p class="auth-copy">Sign in to use the shared business database.</p>
+        <label>
+          Email
+          <input type="email" id="loginEmail" required autocomplete="email">
+        </label>
+        <label>
+          Password
+          <input type="password" id="loginPassword" required autocomplete="current-password">
+        </label>
+        <button type="submit" class="primary-button">Sign in</button>
+        <p class="auth-message" id="authMessage"></p>
+      </form>
+    </section>
+
+    <main class="app-shell hidden" id="appShell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="storeEyebrow">PATANJALI STORE</p>
+          <h1 id="appTitle">Cash Flow</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="status-pill" id="dbStatus">Connecting database...</div>
+          <button type="button" class="secondary-button" id="signOutButton">Sign out</button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <form id="entryForm" class="panel entry-panel" autocomplete="off">
+          <div class="panel-heading entry-heading">
+            <div>
+              <h2>Daily Entry</h2>
+              <p>Enter every amount, then compare with the system sale.</p>
+            </div>
+            <div class="entry-actions">
+              <button type="button" class="primary-button" id="newEntryButton">New</button>
+            </div>
+          </div>
+
+          <div class="entry-layout">
+            <section class="entry-column cash-column" aria-label="Cash drawer details">
+              <div class="field-grid two">
+                <label class="date-field">
+                  Entry date
+                  <input type="date" id="entryDate" required>
+                </label>
+
+                <label class="balance-field">
+                  Balance of Yesterday
+                  <input type="number" id="yesterdayBalance" min="0" step="1" inputmode="numeric" pattern="[0-9]*" required>
+                </label>
+              </div>
+
+              <div class="section-heading">
+                <h3>Cash Drawer</h3>
+                <span>All entries required</span>
+              </div>
+              <div class="denomination-grid" id="denominationGrid"></div>
+
+              <div class="cash-total-row">
+                <span>Total cash in drawer</span>
+                <strong id="cashBreakdownTotal">₹0</strong>
+              </div>
+              <div class="cash-total-row cash-sale-row">
+                <span>Total Cash Sale Today</span>
+                <strong id="totalCashSaleToday">₹0</strong>
+              </div>
+            </section>
+
+            <section class="entry-column payments-column" aria-label="Payment details">
+              <div class="section-heading payment-heading">
+                <h3>Payments</h3>
+                <button type="button" class="icon-button" id="refreshSystemButton" title="Refresh system sale" aria-label="Refresh system sale">↻</button>
+              </div>
+              <div class="field-grid payment-fields">
+                <label>
+                  SSC Payments
+                  <input type="number" id="sscSettlement" min="0" step="1" inputmode="numeric" pattern="[0-9]*" required>
+                </label>
+                <label>
+                  Debit / Credit Card Payments
+                  <input type="number" id="cardSettlement" min="0" step="1" inputmode="numeric" pattern="[0-9]*" required>
+                </label>
+                <label>
+                  UPI Payments
+                  <input type="number" id="upiSettlement" min="0" step="1" inputmode="numeric" pattern="[0-9]*" required>
+                </label>
+              </div>
+
+              <div class="cash-total-row total-row">
+                <span>Total</span>
+                <strong id="paymentGrandTotal">₹0</strong>
+              </div>
+
+              <label class="system-sale-field">
+                SALE in system
+                <input type="number" id="systemSale" min="0" step="1" inputmode="numeric" pattern="[0-9]*" required>
+              </label>
+
+              <div class="calculation-box">
+                <div>
+                  <span>Difference after calculation</span>
+                  <strong id="differenceResult">₹0</strong>
+                </div>
+                <div>
+                  <span>Formula</span>
+                  <p>Total - SALE in system</p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <label class="notes-field">
+            Notes
+            <textarea id="notes" rows="3" placeholder="Optional note for this date"></textarea>
+          </label>
+
+          <section class="bank-section" aria-label="Bank deposit details">
+            <div class="section-heading bank-heading">
+              <h3>Bank Deposit</h3>
+              <span>Reference only</span>
+            </div>
+
+            <div class="field-grid two bank-deposit-grid">
+              <label>
+                Money Deposited in Bank Today - Cash
+                <input type="number" id="bankDepositCash" min="0" step="1" inputmode="numeric" pattern="[0-9]*">
+              </label>
+              <label>
+                Money Deposited in Bank Today - SSC
+                <input type="number" id="bankDepositSsc" min="0" step="1" inputmode="numeric" pattern="[0-9]*">
+              </label>
+            </div>
+
+            <div class="cash-total-row bank-total-row">
+              <span>Money Deposited in Bank Today</span>
+              <strong id="bankDepositTotal">₹0</strong>
+            </div>
+          </section>
+
+          <div class="form-actions">
+            <button type="button" class="primary-button" id="saveButton">Save daily entry</button>
+            <button type="button" class="danger-button" id="deleteButton" disabled>Delete</button>
+          </div>
+          <p class="save-message" id="saveMessage" aria-live="polite"></p>
+        </form>
+
+        <section class="panel history-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>History</h2>
+              <p>Open any date to review or edit.</p>
+            </div>
+          </div>
+          <div class="history-loader">
+            <input type="date" id="searchDate" aria-label="Load date">
+            <button type="button" class="secondary-button" id="loadDateButton">Load date</button>
+          </div>
+          <div class="history-list" id="historyList" aria-live="polite"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
